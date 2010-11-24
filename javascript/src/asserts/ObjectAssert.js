@@ -31,6 +31,43 @@ YUITest.ObjectAssert = {
     },
     
     /**
+     * Assert that an object has all of the same properties and property values
+     * as the expected one. It doesn't consider prototype properties.
+     * @param {Object} expected The object with all expected properties and values.
+     * @param {Object} actual The object to inspect.
+     * @param {String} message (Optional) The message to display if the assertion fails.
+     * @method areSame
+     * @static
+     */
+    areSame: function (expected, actual, message) {
+        YUITest.Assert._increment();
+
+
+        if ('object' !== typeof actual) {
+            throw new YUITest.UnexpectedValue(YUITest.Assert._formatMessage(message, "Value should be an object."), actual);
+        }
+        if ('object' !== typeof expected) {
+            throw new YUITest.UnexpectedValue(YUITest.Assert._formatMessage(message, "Value should be an object."), expected);
+        }
+
+        for (var key in expected) {
+            if (expected.hasOwnProperty(key)) {
+                if ('object' === typeof actual[key] || 'object' === typeof expected[key]) {
+                    YUITest.ObjectAssert.areSame(expected[key], actual[key], message);
+                } else if (actual[key] !== expected[key]) {
+                    throw new YUITest.ComparisonFailure(YUITest.Assert._formatMessage(message, "Values should be equal for property " + key), expected[key], actual[key]);
+                }
+            }
+        }
+
+        for (key in actual) {
+            if (actual.hasOwnProperty(key) && 'undefined' === typeof expected[key]) {
+                throw new YUITest.ComparisonFailure(YUITest.Assert._formatMessage(message, 'Property is not defined on actual object ' + key));
+            }
+        }
+    },
+
+    /**
      * Asserts that an object has a property with the given name.
      * @param {String} propertyName The name of the property to test.
      * @param {Object} object The object to search.

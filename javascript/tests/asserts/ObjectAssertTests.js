@@ -16,6 +16,144 @@
     var suite = new YUITest.TestSuite("Object Assert Tests");
     
     //-------------------------------------------------------------------------
+    // Test Case for areSame()
+    //-------------------------------------------------------------------------
+
+    suite.add(new YUITest.TestCase({
+
+        name : 'areSame() Tests',
+
+        _should: {
+            fail: {
+                "areSame() should fail for missing key": "\nExpected: rocks (string)\nActual: undefined (undefined)",
+                "areSame() should fail for one key too much": "\nExpected: undefined (undefined)\nActual: rocks (string)",
+                "areSame() should fail for two nested unequal objects": "\nExpected: hi (string)\nActual: ho (string)",
+                "areSame() should fail for property on the expected object's prototype": "\nExpected hi (string)\nActual: prototype property",
+                "areSame() should fail for property on the actual object's prototype": "\nExpected hi (string)\nActual: prototype property"
+            }
+        },
+
+        /**
+         * Test that areSame() passes when two empty objects are given.
+         */
+        "areSame() should pass for empty objects": function () {
+            ObjectAssert.areSame({}, {});
+        },
+
+        /**
+         * Test that areSame() passes when two simple objects are given.
+         */
+        "areSame() should pass for simple objects": function () {
+            ObjectAssert.areSame({ msg: 'hi' }, { msg: 'hi' });
+        },
+
+        /**
+         * Test that areSame() passes when the same instance of the same
+         * object is given.
+         */
+        "areSame() should pass for the same object instance": function () {
+            var object = { msg: 'hi' };
+            ObjectAssert.areSame(object, object);
+        },
+
+        /**
+         * Test that areSame() fails when the expected object has more
+         * properties than the other.
+         */
+        "areSame() should fail for missing key": function () {
+            ObjectAssert.areSame({ msg: 'hi', yui: 'rocks' }, { msg: 'hi' });
+        },
+
+        /**
+         * Test that areSame() fails when the given object has more
+         * properties than expected.
+         */
+        "areSame() should fail for one key too much": function () {
+            ObjectAssert.areSame({ msg: 'hi'}, { msg: 'hi', yui: 'rocks' });
+        },
+
+        /**
+         * Test that areSame() passes when two nested objects are given.
+         */
+        "areSame() should pass for two nested objects": function () {
+            var expectedObject, compareObject;
+
+            expectedObject = {
+                msg: {
+                    to: 'Alice',
+                    text: 'hi'
+                }
+            };
+
+            compareObject = {
+                msg: {
+                    to: 'Alice',
+                    text: 'hi'
+                }
+            };
+
+            ObjectAssert.areSame(expectedObject, compareObject);
+        },
+
+        /**
+         * Test that areSame() fails when two nested but not equal
+         * objects are given.
+         */
+        "areSame() should fail for two nested unequal objects": function () {
+            var expectedObject, compareObject;
+
+            expectedObject = {
+                msg: {
+                    to: 'Alice',
+                    text: 'hi'
+                }
+            };
+
+            compareObject = {
+                msg: {
+                    to: 'Alice',
+                    text: 'ho'
+                }
+            };
+
+            ObjectAssert.areSame(expectedObject, compareObject);
+        },
+
+        /**
+         * Test that areSame() fails when the property is only on the proto-
+         * type of the expected object.
+         */
+        "areSame() should fail for property on the expected object's prototype": function () {
+            var expectedObject, compareObject;
+
+            expectedObject = function () {};
+            expectedObject.prototype.msg = 'hi';
+
+            compareObject = {
+                msg: 'hi'
+            };
+
+            ObjectAssert.areSame(expectedObject, compareObject);
+        },
+
+        /**
+         * Test that areSame() fails when the property is only on the proto-
+         * type of the actual object.
+         */
+        "areSame() should fail for property on the actual object's prototype": function () {
+            var expectedObject, compareObject;
+            expectedObject = {
+                msg: 'hi'
+            };
+
+            compareObject = function () {};
+            compareObject.prototype.msg = 'hi';
+
+            ObjectAssert.areSame(expectedObject, compareObject);
+        }
+    }));
+
+    //-------------------------------------------------------------------------
     // Test Case for ownsOrInheritsKey()
     //-------------------------------------------------------------------------
     
